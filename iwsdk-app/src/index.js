@@ -55,7 +55,7 @@ World.create(document.getElementById('scene-container'), {
   floorEntity.addComponent(PhysicsBody, { state: PhysicsState.Static });
   floorEntity.addComponent(PhysicsShape, {shape: PhysicsShapeType.Auto, restitution: 0.9,});
 
-  const cylinderGeometry = new CylinderGeometry(0.07, 0.1, 1, 32);
+  const cylinderGeometry = new CylinderGeometry(0.1, 0.1, 1, 32);
   const bat = new Mesh(cylinderGeometry, greenMaterial);
   bat.position.set(1, 1, -.5);
   bat.rotation.x = Math.PI / 2;
@@ -68,17 +68,32 @@ World.create(document.getElementById('scene-container'), {
   const wallMesh = new Mesh(new PlaneGeometry(600, 10), new MeshStandardMaterial({color:"black"}));
   wallMesh.position.set(0, -5, -30);
   const wallEntity = world.createTransformEntity(wallMesh);
-  wallEntity.addComponent(LocomotionEnvironment, { type: EnvironmentType.STATIC });
+  
   wallEntity.addComponent(PhysicsBody, { state: PhysicsState.Static });
   wallEntity.addComponent(PhysicsShape, {shape: PhysicsShapeType.Auto, restitution: 0.9,});
 
-
+  console.log('a button pressed!');
 
   function gameLoop() {
     // code here runs every frame
     if (sphereEntity.position.z < -30) {
-      console.log('Home run');
+        sphereEntity.destroy()
     }
+
+    const leftCtrl = world.input.gamepads.left
+    if (leftCtrl?.gamepad.buttons[4].pressed) {
+          console.log('x button pressed!');
+          // do something like spawn a new object
+          sphereEntity.position.set(0, 5, -3);
+    }
+    const rightCtrl = world.input.gamepads.right
+    if (rightCtrl?.gamepad.buttons[4].pressed) {
+          console.log('a button pressed!');
+          // do something like spawn a new object
+          batEntity.position.set(1, 1, -.5);
+    }
+
+
 
     requestAnimationFrame(gameLoop);
   }
