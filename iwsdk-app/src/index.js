@@ -66,7 +66,7 @@ World.create(document.getElementById('scene-container'), {
 
 
   const wallMesh = new Mesh(new PlaneGeometry(600, 10), new MeshStandardMaterial({color:"black"}));
-  wallMesh.position.set(0, -5, -30);
+  wallMesh.position.set(0, 5, -30);
   const wallEntity = world.createTransformEntity(wallMesh);
   
   wallEntity.addComponent(PhysicsBody, { state: PhysicsState.Static });
