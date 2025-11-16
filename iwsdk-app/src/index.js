@@ -1,16 +1,19 @@
 import {
   Mesh,
   MeshStandardMaterial,
-  SphereGeometry,PlaneGeometry,
+  SphereGeometry,PlaneGeometry,CylinderGeometry,
   SessionMode,
   World,
-  LocomotionEnvironment,EnvironmentType
+  LocomotionEnvironment,EnvironmentType,
+  
 } from '@iwsdk/core';
 
 import {
   Interactable,
   PanelUI,
-  ScreenSpace
+  ScreenSpace,
+  PhysicsBody, PhysicsShape, PhysicsShapeType, PhysicsState, PhysicsSystem,
+  OneHandGrabbable, DistanceGrabbable,
 } from '@iwsdk/core';
 
 import { PanelSystem } from './panel.js'; // system for displaying "Enter VR" panel on Quest 1
@@ -25,30 +28,69 @@ World.create(document.getElementById('scene-container'), {
     features: { }
   },
 
-  features: { locomotion: true },
+  features: { locomotion: true, grabbing: true },
 
 }).then((world) => {
 
   const { camera } = world;
 
+  world.registerSystem(PhysicsSystem).registerComponent(PhysicsBody).registerComponent(PhysicsShape);
   
   // Create a green sphere
   const sphereGeometry = new SphereGeometry(0.25, 32, 32);
   const greenMaterial = new MeshStandardMaterial({ color: "red" });
   const sphere = new Mesh(sphereGeometry, greenMaterial);
-  sphere.position.set(1, 1.5, -3);
+  sphere.position.set(0, 1, -3);
   const sphereEntity = world.createTransformEntity(sphere);
+  sphereEntity.addComponent(PhysicsShape, { shape: PhysicsShapeType.Auto,  density: 0.02,  friction: 0.5,  restitution: 0.9 });
+  sphereEntity.addComponent(PhysicsBody, { state: PhysicsState.Dynamic });
+  sphereEntity.addComponent(Interactable).addComponent(OneHandGrabbable);
+
 
   // create a floor
-  const floorMesh = new Mesh(new PlaneGeometry(20, 20), new MeshStandardMaterial({color:"tan"}));
+  const floorMesh = new Mesh(new PlaneGeometry(40, 20), new MeshStandardMaterial({color:"tan"}));
   floorMesh.rotation.x = -Math.PI / 2;
   const floorEntity = world.createTransformEntity(floorMesh);
   floorEntity.addComponent(LocomotionEnvironment, { type: EnvironmentType.STATIC });
+  floorEntity.addComponent(PhysicsBody, { state: PhysicsState.Static });
+  floorEntity.addComponent(PhysicsShape, {shape: PhysicsShapeType.Auto, restitution: 0.9,});
+
+  const cylinderGeometry = new CylinderGeometry(0.07, 0.1, 1, 32);
+  const bat = new Mesh(cylinderGeometry, greenMaterial);
+  bat.position.set(1, 1, -.5);
+  bat.rotation.x = Math.PI / 2;
+  const batEntity = world.createTransformEntity(bat);
+  batEntity.addComponent(PhysicsShape, { shape: PhysicsShapeType.Auto,  density: 0.2,  friction: 0.5,  restitution: 0.9 });
+  batEntity.addComponent(PhysicsBody, { state: PhysicsState.Kinematic });
+  batEntity.addComponent(Interactable).addComponent(OneHandGrabbable);
+
+
+  const wallMesh = new Mesh(new PlaneGeometry(600, 10), new MeshStandardMaterial({color:"black"}));
+  wallMesh.position.set(0, 5, -30);
+  const wallEntity = world.createTransformEntity(wallMesh);
+  wallEntity.addComponent(LocomotionEnvironment, { type: EnvironmentType.STATIC });
+  wallEntity.addComponent(PhysicsBody, { state: PhysicsState.Static });
+  wallEntity.addComponent(PhysicsShape, {shape: PhysicsShapeType.Auto, restitution: 0.9,});
+
+
+
+  function gameLoop() {
+    // code here runs every frame
+    if (object.position.z < -30) {
+      console.log("Home run");
+    }
+
+    requestAnimationFrame(gameLoop);
+  }
+  gameLoop();
 
 
 
 
-  
+
+
+
+
 
 
 
