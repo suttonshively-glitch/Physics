@@ -5,7 +5,7 @@ import {
   SessionMode,
   World,
   LocomotionEnvironment,EnvironmentType,
-  
+  CanvasTexture
 } from '@iwsdk/core';
 
 import {
@@ -40,7 +40,7 @@ World.create(document.getElementById('scene-container'), {
   const sphereGeometry = new SphereGeometry(0.25, 32, 32);
   const greenMaterial = new MeshStandardMaterial({ color: "red" });
   const sphere = new Mesh(sphereGeometry, greenMaterial);
-  sphere.position.set(0, 1, -3);
+  sphere.position.set(0, 5, -3);
   const sphereEntity = world.createTransformEntity(sphere);
   sphereEntity.addComponent(PhysicsShape, { shape: PhysicsShapeType.Auto,  density: 0.02,  friction: 0.5,  restitution: 0.9 });
   sphereEntity.addComponent(PhysicsBody, { state: PhysicsState.Dynamic });
@@ -66,7 +66,7 @@ World.create(document.getElementById('scene-container'), {
 
 
   const wallMesh = new Mesh(new PlaneGeometry(600, 10), new MeshStandardMaterial({color:"black"}));
-  wallMesh.position.set(0, 5, -30);
+  wallMesh.position.set(0, -5, -30);
   const wallEntity = world.createTransformEntity(wallMesh);
   wallEntity.addComponent(LocomotionEnvironment, { type: EnvironmentType.STATIC });
   wallEntity.addComponent(PhysicsBody, { state: PhysicsState.Static });
@@ -76,8 +76,8 @@ World.create(document.getElementById('scene-container'), {
 
   function gameLoop() {
     // code here runs every frame
-    if (object.position.z < -30) {
-      console.log("Home run");
+    if (sphereEntity.position.z < -30) {
+      console.log('Home run');
     }
 
     requestAnimationFrame(gameLoop);
@@ -130,5 +130,11 @@ World.create(document.getElementById('scene-container'), {
       return false;
     }
   }
+
+
+
+
+
+
 
 });
