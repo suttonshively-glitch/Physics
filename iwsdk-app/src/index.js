@@ -5,7 +5,8 @@ import {
   SessionMode,
   World,
   LocomotionEnvironment,EnvironmentType,
-  CanvasTexture
+  AssetType,
+  AssetManager,
 } from '@iwsdk/core';
 
 import {
@@ -18,7 +19,14 @@ import {
 
 import { PanelSystem } from './panel.js'; // system for displaying "Enter VR" panel on Quest 1
 
-const assets = { };
+const assets = { 
+    paperball: {                              
+    url: '/gltf/plantSansevieria/paperball.glb',
+    type: AssetType.GLTF,
+    priority: 'critical',
+  },
+
+ };
 
 World.create(document.getElementById('scene-container'), {
   assets,
@@ -37,12 +45,12 @@ World.create(document.getElementById('scene-container'), {
   world.registerSystem(PhysicsSystem).registerComponent(PhysicsBody).registerComponent(PhysicsShape);
   
   // Create a green sphere
-  const sphereGeometry = new SphereGeometry(0.25, 32, 32);
+
   const greenMaterial = new MeshStandardMaterial({ color: "red" });
-  const sphere = new Mesh(sphereGeometry, greenMaterial);
+  const sphere = AssetManager.getGLTF('paperball').scene;
   sphere.position.set(0, 5, -3);
   const sphereEntity = world.createTransformEntity(sphere);
-  sphereEntity.addComponent(PhysicsShape, { shape: PhysicsShapeType.Auto,  density: 0.02,  friction: 0.5,  restitution: 0.9 });
+  sphereEntity.addComponent(PhysicsShape, { shape: PhysicsShapeType.Sphere,  density: 0.02,  friction: 0.5,  restitution: 0.9 });
   sphereEntity.addComponent(PhysicsBody, { state: PhysicsState.Dynamic });
   sphereEntity.addComponent(Interactable).addComponent(OneHandGrabbable);
 
@@ -72,25 +80,29 @@ World.create(document.getElementById('scene-container'), {
   wallEntity.addComponent(PhysicsBody, { state: PhysicsState.Static });
   wallEntity.addComponent(PhysicsShape, {shape: PhysicsShapeType.Auto, restitution: 0.9,});
 
-  console.log('a button pressed!');
+
 
   function gameLoop() {
     // code here runs every frame
-    if (sphereEntity.position.z < -30) {
-        sphereEntity.destroy()
+    if (sphereEntity.object3D.position.z < -30) {
+        console.log('we have detected position');
+        sphereEntity.removeComponent(PhysicsBody);
+        sphereEntity.removeComponent(PhysicsShape);
+        sphereEntity.destroy();
+        sphereEntity = null;
     }
 
     const leftCtrl = world.input.gamepads.left
-    if (leftCtrl?.gamepad.buttons[4].pressed) {
-          console.log('x button pressed!');
+    if (leftCtrl?.gamepad.buttons[5].pressed) {
+          console.log('y button pressed!');
           // do something like spawn a new object
-          sphereEntity.position.set(0, 5, -3);
+          sphereEntity.object3D.position.set(0, 5, -3);
     }
     const rightCtrl = world.input.gamepads.right
-    if (rightCtrl?.gamepad.buttons[4].pressed) {
-          console.log('a button pressed!');
+    if (rightCtrl?.gamepad.buttons[5].pressed) {
+          console.log('b button pressed!');
           // do something like spawn a new object
-          batEntity.position.set(1, 1, -.5);
+          batEntity.object3D.position.set(1, 1, -.5);
     }
 
 
